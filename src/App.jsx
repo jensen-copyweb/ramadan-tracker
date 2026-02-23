@@ -865,7 +865,7 @@ function LogTab({ session, user }) {
 
 // ═══ GYM TAB ══════════════════════════════════════════════════
 function GymTab({ session, user }) {
-  const TYPES = ["Upper Body", "Lower Body", "Cardio", "Skipping", "Abs", "Full Body", "HIIT", "Yoga/Stretch"];
+  const TYPES = ["Upper Body", "Lower Body", "Cardio", "Skipping", "Abs", "Full Body", "HIIT", "Stretch", "Pilates"];
   const [sel, setSel] = useState([]);
   const [rating, setRating] = useState(0);
   const [dur, setDur] = useState("");
