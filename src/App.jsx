@@ -869,6 +869,7 @@ function GymTab({ session, user }) {
   const [sel, setSel] = useState([]);
   const [rating, setRating] = useState(0);
   const [dur, setDur] = useState("");
+  const [logDate, setLogDate] = useState(toDate());
   const [sessions, setSessions] = useState([]);
   const [toast, setToast] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -887,10 +888,11 @@ function GymTab({ session, user }) {
     if (sel.length === 0) { setToast({ msg: "Select at least one workout type", type: "gold" }); return; }
     if (!rating) { setToast({ msg: "Please add a star rating", type: "gold" }); return; }
     setSaving(true);
-    const res = await d.ins("gym_sessions", { user_id: uid, log_date: toDate(), types: sel, rating, duration: parseInt(dur) || null });
+    const res = await d.ins("gym_sessions", { user_id: uid, log_date: logDate, types: sel, rating, duration: parseInt(dur) || null });
     if (!res.ok) { setToast({ msg: "❌ Error saving session.", type: "gold" }); setSaving(false); return; }
-    await d.ins("activity_logs", { user_id: uid, action: `🏋️ Gym: ${sel.join(", ")} — ${rating}⭐${dur ? ` — ${dur}min` : ""}` });
-    setSel([]); setRating(0); setDur("");
+    const dayLabel = logDate === toDate() ? "today" : logDate;
+    await d.ins("activity_logs", { user_id: uid, action: `🏋️ Gym: ${sel.join(", ")} — ${rating}⭐${dur ? ` — ${dur}min` : ""} (${dayLabel})` });
+    setSel([]); setRating(0); setDur(""); setLogDate(toDate());
     await load();
     setToast({ msg: "💪 Gym session logged!", type: "green" });
     setSaving(false);
@@ -915,6 +917,10 @@ function GymTab({ session, user }) {
         <div style={{ fontSize: 12, color: "#9d9ab0", marginBottom: 8 }}>Session Rating</div>
         <div style={{ marginBottom: 16 }}><StarRating value={rating} onChange={setRating} size={34} /></div>
         <input placeholder="Duration (minutes)" value={dur} onChange={e => setDur(e.target.value)} type="number" style={{ ...inp, marginBottom: 10 }} />
+        <div style={{ fontSize: 12, color: "#9d9ab0", marginBottom: 8 }}>Session Date</div>
+        <input type="date" value={logDate} onChange={e => setLogDate(e.target.value)}
+          min="2026-02-19" max={toDate()}
+          style={{ ...inp, marginBottom: 14, colorScheme: "dark" }} />
         <Btn onClick={save} disabled={saving} style={{ width: "100%", marginTop: 6 }}>{saving ? "Saving..." : "💪 Log Session"}</Btn>
       </Card>
       <Card style={{ marginBottom: 0 }}>
